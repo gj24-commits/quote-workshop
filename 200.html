@@ -378,51 +378,51 @@ const accommodations = [
       cost: { low_wd: 163000, low_we: 240000, semi_wd: 163000, semi_we: 240000, high_wd: 240000, high_we: 240000 } },
 ];
 
+// pricing: 배열. 각 항목은 { label: '성인', unit: 30000 } 형태. unit이 0이면 '문의'
 const options = {
     '경남_통영': [
-        { name: '한산마리나 요트투어(선셋)', price: '30,000원', desc: '1시간 소요', ages: '전연령' },
-        { name: '한산마리나 섬요트투어', price: '50,000원', desc: '3시간 소요', ages: '전연령' },
-        { name: '봉수골 마을투어', price: '20,000원', desc: '마을투어', ages: '청소년, 성인' },
-        { name: '봉수골 마을투어+차담회', price: '25,000원', desc: '마을투어+차담회', ages: '청소년, 성인' },
-        { name: '학림도 어촌체험', price: '문의', desc: '바지락캐기, 선상낚시, 통발체험, 깡통열차', ages: '전연령' },
+        { name: '한산마리나 요트투어(선셋)', pricing: [{label:'1인', unit:30000}], desc: '1시간 소요', ages: '전연령' },
+        { name: '한산마리나 섬요트투어', pricing: [{label:'1인', unit:50000}], desc: '3시간 소요', ages: '전연령' },
+        { name: '봉수골 마을투어', pricing: [{label:'1인', unit:20000}], desc: '마을투어', ages: '청소년, 성인' },
+        { name: '봉수골 마을투어+차담회', pricing: [{label:'1인', unit:25000}], desc: '마을투어+차담회', ages: '청소년, 성인' },
+        { name: '학림도 어촌체험', pricing: [{label:'1인', unit:0}], desc: '바지락캐기, 선상낚시, 통발체험, 깡통열차', ages: '전연령' },
     ],
     '경남_남해': [
-        { name: '미라도르 요트투어', price: '성인 20,000원 / 어린이 10,000원', desc: '', ages: '전연령' },
-        { name: '미라도르 선셋요트투어', price: '성인 30,000원 / 청소년 20,000원', desc: '', ages: '전연령' },
-        { name: '소셜다이닝', price: '30,000원', desc: '', ages: '어린이~성인' },
-        { name: '천영공방 리페어', price: '문의', desc: '프리저브드캔들홀더, 바다 그립톡, 레진아트, 유자비누', ages: '전연령', tag: 'ESG, 공방' },
-        { name: '유자 아뜰리에', price: '문의', desc: '향수 만들기', ages: '전연령', tag: '공방' },
-        { name: '내산공방', price: '문의', desc: '편백나무 오르골체험', ages: '전연령', tag: '공방' },
-        { name: '글꼴아뜰리에', price: '문의', desc: '글라스아트, 도우아트 화분, 레진아트', ages: '전연령', tag: '공방' },
-        { name: 'B급 상점', price: '문의', desc: '나만의 티셔츠, 네임택 만들기', ages: '전연령', tag: '공방' },
-        { name: '카약투어', price: '문의', desc: '설리해수욕장 (6~9월)', ages: '전연령' },
-        { name: '마린레저', price: '문의', desc: '바나나보트, 플라잉피쉬, 제트스키 등', ages: '전연령' },
+        { name: '미라도르 요트투어', pricing: [{label:'성인', unit:20000},{label:'어린이', unit:10000},{label:'영유아', unit:5000}], desc: '36개월 미만 무료', ages: '전연령' },
+        { name: '미라도르 선셋요트투어', pricing: [{label:'성인', unit:30000},{label:'청소년', unit:20000},{label:'영유아', unit:10000}], desc: '36개월 미만 무료', ages: '전연령' },
+        { name: '소셜다이닝', pricing: [{label:'1인', unit:30000}], desc: '', ages: '어린이~성인' },
+        { name: '천영공방 리페어', pricing: [{label:'1인', unit:0}], desc: '프리저브드캔들홀더, 바다 그립톡, 레진아트, 유자비누', ages: '전연령', tag: 'ESG, 공방' },
+        { name: '유자 아뜰리에', pricing: [{label:'1인', unit:0}], desc: '향수 만들기', ages: '전연령', tag: '공방' },
+        { name: '내산공방', pricing: [{label:'1인', unit:0}], desc: '편백나무 오르골체험', ages: '전연령', tag: '공방' },
+        { name: '글꼴아뜰리에', pricing: [{label:'1인', unit:0}], desc: '글라스아트, 도우아트 화분, 레진아트', ages: '전연령', tag: '공방' },
+        { name: 'B급 상점', pricing: [{label:'1인', unit:0}], desc: '나만의 티셔츠, 네임택 만들기', ages: '전연령', tag: '공방' },
+        { name: '카약투어', pricing: [{label:'1인', unit:0}], desc: '설리해수욕장 (6~9월)', ages: '전연령' },
+        { name: '마린레저', pricing: [{label:'1인', unit:0}], desc: '바나나보트, 플라잉피쉬, 제트스키 등', ages: '전연령' },
     ],
     '경북_경주': [
-        { name: '버드파크', price: '성인 20,000원 / 어린이 15,000원', desc: '24개월 미만 무료', ages: '전연령' },
-        { name: '정글미디어파크', price: '성인 19,000원 / 청소년 17,000원 / 어린이 13,000원', desc: '36개월 미만 무료', ages: '전연령' },
-        { name: '경주엑스포대공원', price: '성인 12,000원 / 어린이 10,000원', desc: '만65세 이상 4,000원', ages: '전연령' },
-        { name: '히어로플레이파크', price: '아동 3시간 무료 / 부모님 입장권 7,000원', desc: '', ages: '어린이~성인' },
-        { name: '자동차 박물관', price: '성인 9,900원 / 청소년 8,800원 / 어린이 6,600원', desc: '36개월 미만 무료', ages: '전연령' },
+        { name: '버드파크', pricing: [{label:'성인', unit:20000},{label:'어린이', unit:15000}], desc: '24개월 미만 무료', ages: '전연령' },
+        { name: '정글미디어파크', pricing: [{label:'성인', unit:19000},{label:'청소년', unit:17000},{label:'어린이', unit:13000}], desc: '36개월 미만 무료', ages: '전연령' },
+        { name: '경주엑스포대공원', pricing: [{label:'성인', unit:12000},{label:'어린이', unit:10000}], desc: '만65세 이상 4,000원', ages: '전연령' },
+        { name: '히어로플레이파크', pricing: [{label:'부모님', unit:7000},{label:'아동', unit:0}], desc: '아동 3시간 무료', ages: '어린이~성인' },
+        { name: '자동차 박물관', pricing: [{label:'성인', unit:9900},{label:'청소년', unit:8800},{label:'어린이', unit:6600}], desc: '36개월 미만 무료', ages: '전연령' },
     ],
     '제주_서귀포': [
-        { name: '올레길 걷기 투어', price: '문의', desc: '제주 전역', ages: '어린이~성인', tag: '액티비티, 힐링' },
-        { name: '스누피 공원', price: '문의', desc: '', ages: '전연령', tag: '자유관람, 힐링' },
-        { name: '981 파크', price: '문의', desc: '', ages: '어린이~성인', tag: '액티비티' },
-        { name: '아쿠아플래닛 제주', price: '문의', desc: '', ages: '전연령', tag: '자유관람' },
-        { name: '감귤따기 체험', price: '문의', desc: '', ages: '전연령', tag: '체험' },
-        { name: 'ATV', price: '문의', desc: '제주시, 서귀포시', ages: '어린이~성인', tag: '액티비티' },
-        { name: '오설록 티뮤지엄', price: '문의', desc: '', ages: '전연령', tag: '힐링' },
-        { name: '승마공원', price: '문의', desc: '애월읍', ages: '어린이~성인', tag: '액티비티' },
-        { name: '네모바지선 낚시', price: '문의', desc: '서귀포', ages: '전연령', tag: '레저' },
+        { name: '올레길 걷기 투어', pricing: [{label:'1인', unit:0}], desc: '제주 전역', ages: '어린이~성인', tag: '액티비티, 힐링' },
+        { name: '스누피 공원', pricing: [{label:'1인', unit:0}], desc: '', ages: '전연령', tag: '자유관람, 힐링' },
+        { name: '981 파크', pricing: [{label:'1인', unit:0}], desc: '', ages: '어린이~성인', tag: '액티비티' },
+        { name: '아쿠아플래닛 제주', pricing: [{label:'1인', unit:0}], desc: '', ages: '전연령', tag: '자유관람' },
+        { name: '감귤따기 체험', pricing: [{label:'1인', unit:0}], desc: '', ages: '전연령', tag: '체험' },
+        { name: 'ATV', pricing: [{label:'1인', unit:0}], desc: '제주시, 서귀포시', ages: '어린이~성인', tag: '액티비티' },
+        { name: '오설록 티뮤지엄', pricing: [{label:'1인', unit:0}], desc: '', ages: '전연령', tag: '힐링' },
+        { name: '승마공원', pricing: [{label:'1인', unit:0}], desc: '애월읍', ages: '어린이~성인', tag: '액티비티' },
+        { name: '네모바지선 낚시', pricing: [{label:'1인', unit:0}], desc: '서귀포', ages: '전연령', tag: '레저' },
     ],
     '전라도_진안': [
-        { name: '치유장비 1시간', price: '16,000원', desc: '기본구성', ages: '전연령' },
-        { name: '산림치유 프로그램 2시간', price: '12,000원', desc: '숲산책, 싱잉볼, 다도명상 등', ages: '전연령' },
-        { name: '식사 (일반식 성인)', price: '8,000원', desc: '', ages: '성인' },
-        { name: '식사 (일반식 어린이)', price: '5,500원', desc: '', ages: '어린이' },
-        { name: '식사 (특식)', price: '15,000원', desc: '성인, 어린이 동일', ages: '전연령' },
-        { name: '대관 (소통카페)', price: '150,000원 (2시간)', desc: '', ages: '-' },
+        { name: '치유장비 1시간', pricing: [{label:'1인', unit:16000}], desc: '기본구성', ages: '전연령' },
+        { name: '산림치유 프로그램 2시간', pricing: [{label:'1인', unit:12000}], desc: '숲산책, 싱잉볼, 다도명상 등', ages: '전연령' },
+        { name: '식사 (일반식)', pricing: [{label:'성인', unit:8000},{label:'어린이', unit:5500}], desc: '', ages: '전연령' },
+        { name: '식사 (특식)', pricing: [{label:'1인', unit:15000}], desc: '성인, 어린이 동일', ages: '전연령' },
+        { name: '대관 (소통카페)', pricing: [{label:'1건', unit:150000}], desc: '2시간 기준', ages: '-', isFixed: true },
     ],
 };
 
@@ -621,8 +621,11 @@ function selectDay(d) {
 }
 
 // Options
-function renderOptions() {
-    const wrap = document.getElementById('optionContent');
+function formatPricing(pricing) {
+    return pricing.map(p => p.unit > 0 ? `${p.label} ${p.unit.toLocaleString()}원` : `${p.label} 문의`).join(' / ');
+}
+
+function getMatchedOptions() {
     let matched = [];
     for (const key in options) {
         if (key.startsWith(selectedRegion) || accommodations.filter(a => a.region === selectedRegion).some(a => key.includes(a.subregion.replace('시','').replace('군','')))) {
@@ -634,12 +637,17 @@ function renderOptions() {
         for (const key in options) for (const sub of subs) if (key.includes(sub.replace('시','').replace('군',''))) matched = matched.concat(options[key].map(o => ({...o, groupKey: key})));
     }
     const seen = new Set();
-    matched = matched.filter(o => { const k = o.name+o.price; if (seen.has(k)) return false; seen.add(k); return true; });
+    return matched.filter(o => { const k = o.name; if (seen.has(k)) return false; seen.add(k); return true; });
+}
+
+function renderOptions() {
+    const wrap = document.getElementById('optionContent');
+    const matched = getMatchedOptions();
     if (!matched.length) { wrap.innerHTML = '<div class="empty-msg">선택한 지역에 추가 옵션이 없습니다.</div>'; return; }
     wrap.innerHTML = '<div class="option-grid">' + matched.map((o, i) => {
         const sel = selectedOptions.find(s => s.name === o.name);
         return `<div class="option-card ${sel?'selected':''}" onclick="toggleOption(${i}, this)" data-oidx="${i}">
-            <h4>${o.name}</h4><div class="option-price">${o.price}</div>
+            <h4>${o.name}</h4><div class="option-price">${formatPricing(o.pricing)}</div>
             ${o.desc ? `<div class="option-tag">${o.desc}</div>` : ''}
             <div class="option-age">${o.ages||''} ${o.tag?'| '+o.tag:''}</div></div>`;
     }).join('') + '</div>';
@@ -648,19 +656,56 @@ function renderOptions() {
 }
 
 function toggleOption(idx, el) {
-    const o = document.getElementById('optionContent')._options[idx];
+    const matched = getMatchedOptions();
+    const o = matched[idx];
     const ex = selectedOptions.findIndex(s => s.name === o.name);
-    if (ex >= 0) { selectedOptions.splice(ex, 1); el.classList.remove('selected'); }
-    else { selectedOptions.push({ name: o.name, price: o.price }); el.classList.add('selected'); }
+    if (ex >= 0) {
+        selectedOptions.splice(ex, 1);
+        el.classList.remove('selected');
+    } else {
+        // 각 pricing 항목에 대해 수량 0으로 초기화
+        const qtys = o.pricing.map(p => ({ label: p.label, unit: p.unit, qty: 0 }));
+        selectedOptions.push({ name: o.name, pricing: o.pricing, qtys, isFixed: o.isFixed || false });
+        el.classList.add('selected');
+    }
     renderSelectedOptions();
 }
 
 function removeOption(name) { selectedOptions = selectedOptions.filter(o => o.name !== name); renderOptions(); }
 
+function updateOptionQty(optName, pricingIdx, val) {
+    const opt = selectedOptions.find(o => o.name === optName);
+    if (opt) { opt.qtys[pricingIdx].qty = parseInt(val) || 0; }
+    renderSelectedOptions();
+}
+
+function calcOptionSubtotal(opt) {
+    if (opt.isFixed) return opt.qtys[0].unit * (opt.qtys[0].qty || 1);
+    return opt.qtys.reduce((sum, q) => sum + (q.unit > 0 ? q.unit * q.qty : 0), 0);
+}
+
 function renderSelectedOptions() {
     const wrap = document.getElementById('selectedOptionItems');
     if (!selectedOptions.length) { wrap.innerHTML = '<div style="color:#9ca3af;font-size:13px;padding:8px;">옵션을 선택해주세요 (선택사항)</div>'; return; }
-    wrap.innerHTML = selectedOptions.map(o => `<div class="selected-item"><span>${o.name}</span><span>${o.price} <span class="remove" onclick="removeOption('${o.name}')">X</span></span></div>`).join('');
+    wrap.innerHTML = selectedOptions.map(o => {
+        const subtotal = calcOptionSubtotal(o);
+        const qtyInputs = o.qtys.map((q, pi) => {
+            if (q.unit === 0) return `<span style="font-size:12px;color:#9ca3af;">${q.label}: 문의</span>`;
+            return `<label style="font-size:12px;margin-right:12px;">${q.label}(${q.unit.toLocaleString()}원) x
+                <input type="number" class="qty-input" value="${q.qty}" min="0" style="width:50px;font-size:12px;padding:2px 4px;"
+                onchange="updateOptionQty('${o.name}', ${pi}, this.value)">명</label>`;
+        }).join(' ');
+        return `<div class="selected-item" style="flex-wrap:wrap;gap:8px;">
+            <div style="width:100%;display:flex;justify-content:space-between;align-items:center;">
+                <strong>${o.name}</strong>
+                <span class="remove" onclick="removeOption('${o.name}')">X</span>
+            </div>
+            <div style="width:100%;display:flex;flex-wrap:wrap;align-items:center;gap:4px;">
+                ${qtyInputs}
+                ${subtotal > 0 ? `<span style="margin-left:auto;font-weight:600;color:#2d5aa0;">= ${subtotal.toLocaleString()}원</span>` : ''}
+            </div>
+        </div>`;
+    }).join('');
 }
 
 // Quote
@@ -690,7 +735,20 @@ function renderQuote() {
             <td style="text-align:right;font-weight:600;">${subtotal.toLocaleString()}원</td></tr>`;
     }).join('');
 
-    const optionRows = selectedOptions.map(o => `<tr><td colspan="5">${o.name}</td><td style="text-align:right" colspan="2">${o.price}</td></tr>`).join('');
+    let optionTotal = 0;
+    const optionRows = selectedOptions.map(o => {
+        const details = o.qtys.filter(q => q.unit > 0 && q.qty > 0).map(q =>
+            `${q.label} ${q.unit.toLocaleString()}원 x ${q.qty}명 = ${(q.unit * q.qty).toLocaleString()}원`
+        ).join('<br>');
+        const inquiryItems = o.qtys.filter(q => q.unit === 0).map(q => `${q.label}: 별도 문의`).join(', ');
+        const sub = calcOptionSubtotal(o);
+        optionTotal += sub;
+        return `<tr>
+            <td><strong>${o.name}</strong></td>
+            <td colspan="4" style="font-size:12px;">${details}${inquiryItems ? (details ? '<br>' : '') + '<span style="color:#9ca3af;">' + inquiryItems + '</span>' : ''}</td>
+            <td style="text-align:right;font-weight:600;" colspan="2">${sub > 0 ? sub.toLocaleString() + '원' : '별도 문의'}</td>
+        </tr>`;
+    }).join('');
 
     document.getElementById('quotePreview').innerHTML = `
         <div class="quote-header"><h2>견 적 서</h2><div class="quote-date">${dateStr}</div></div>
@@ -709,12 +767,17 @@ function renderQuote() {
             ${accomRows || '<tr><td colspan="6" style="text-align:center;color:#9ca3af;">선택된 숙소가 없습니다</td></tr>'}
             <tr class="subtotal"><td colspan="6" style="text-align:right;">숙소 소계</td><td style="text-align:right;">${accomTotal.toLocaleString()}원</td></tr>
         </tbody></table>
-        ${selectedOptions.length ? `<h3 style="margin:20px 0 10px;font-size:16px;">추가 옵션</h3><table class="quote-table"><thead><tr><th colspan="4">항목</th><th colspan="2" style="text-align:right">가격</th></tr></thead><tbody>${optionRows}</tbody></table>` : ''}
+        ${selectedOptions.length ? `<h3 style="margin:20px 0 10px;font-size:16px;">추가 옵션 (인당 가격)</h3>
+        <table class="quote-table"><thead><tr><th>항목</th><th colspan="4">내역</th><th colspan="2" style="text-align:right">소계</th></tr></thead><tbody>
+            ${optionRows}
+            <tr class="subtotal"><td colspan="5" style="text-align:right;">옵션 소계</td><td style="text-align:right;" colspan="2">${optionTotal > 0 ? optionTotal.toLocaleString() + '원' : '-'}</td></tr>
+        </tbody></table>` : ''}
         <div class="quote-total">
-            <div class="total-label">숙소 합계 금액</div>
-            <div class="total-amount">${accomTotal.toLocaleString()}원</div>
-            <div class="discount-info">시중가 대비 ${discount}% 할인 적용 (${seasonLabel} ${dayLabel} 기준)</div>
-            ${selectedOptions.length ? '<div style="font-size:12px;color:#6b7280;margin-top:4px;">* 추가 옵션 비용은 별도입니다</div>' : ''}
+            <div class="total-label">합계 금액</div>
+            <div class="total-amount">${(accomTotal + optionTotal).toLocaleString()}원</div>
+            <div class="discount-info">숙소: 시중가 대비 ${discount}% 할인 적용 (${seasonLabel} ${dayLabel} 기준)</div>
+            ${optionTotal > 0 ? `<div style="font-size:12px;color:#6b7280;margin-top:2px;">숙소 ${accomTotal.toLocaleString()}원 + 옵션 ${optionTotal.toLocaleString()}원</div>` : ''}
+            ${selectedOptions.some(o => o.qtys.some(q => q.unit === 0)) ? '<div style="font-size:12px;color:#ef4444;margin-top:4px;">* 일부 옵션은 가격 별도 문의</div>' : ''}
         </div>
         <div class="quote-note"><strong>안내사항</strong><br>
             - 본 견적서는 발행일로부터 7일간 유효합니다.<br>
