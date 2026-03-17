@@ -453,6 +453,22 @@ function renderRegions() {
 
 function selectRegion(r) { selectedRegion = r; selectedAccom = []; selectedOptions = []; renderRegions(); }
 
+// 룸타입에서 인원 정보 파싱: "스탠다드 싱글(1)" -> {name:"스탠다드 싱글", capacity:"1명"}
+// "수페리어 트윈(2~3)" -> {name:"수페리어 트윈", capacity:"기준 2명 / 최대 3명"}
+// "독채 풀빌라(~6)" -> {name:"독채 풀빌라", capacity:"최대 6명"}
+function parseRoom(room) {
+    const match = room.match(/^(.+?)\(([^)]+)\)$/);
+    if (!match) return { name: room, capacity: '-' };
+    const name = match[1].trim();
+    const cap = match[2].trim();
+    if (cap.includes('~')) {
+        const parts = cap.split('~');
+        if (parts[0] === '') return { name, capacity: `최대 ${parts[1]}명` };
+        return { name, capacity: `기준 ${parts[0]}명 / 최대 ${parts[1]}명` };
+    }
+    return { name, capacity: `${cap}명` };
+}
+
 function getCostKey() {
     return `${selectedSeason === 'low' ? 'low' : selectedSeason === 'semi' ? 'semi' : 'high'}_${selectedDay === 'weekday' ? 'wd' : 'we'}`;
 }
@@ -504,7 +520,7 @@ function renderAccomTable() {
 
     let html = `<table class="accom-table" id="accomTable"><thead><tr>
         <th class="check-col"></th><th>숙소</th><th>룸타입</th><th>룸수</th><th>수량</th>
-        <th class="price">시중가 (편집가능)</th><th class="price">할인가 (${discount}%)</th>
+        <th>수용인원</th><th class="price">시중가 (편집가능)</th><th class="price">할인가 (${discount}%)</th>
         <th class="margin-col price">원가</th><th class="margin-col price">마진율</th>
     </tr></thead><tbody>`;
 
@@ -512,9 +528,10 @@ function renderAccomTable() {
         const idx = a.globalIdx;
         const cost = a.cost[costKey];
         if (!cost) {
+            const pi = parseRoom(a.room);
             html += `<tr style="opacity:0.4"><td class="check-col"><input type="checkbox" disabled></td>
-                <td>${a.name}</td><td>${a.room}</td><td>${a.rooms||'-'}</td><td>-</td>
-                <td class="price">-</td><td class="price">-</td>
+                <td>${a.name}</td><td>${pi.name}</td><td>${a.rooms||'-'}</td><td>-</td>
+                <td>${pi.capacity}</td><td class="price">-</td><td class="price">-</td>
                 <td class="margin-col price">-</td><td class="margin-col price">-</td></tr>`;
             return;
         }
@@ -525,12 +542,14 @@ function renderAccomTable() {
         const qty = isSelected ? isSelected.qty : 1;
         const marginWarn = parseFloat(margin) < 5;
 
+        const parsed = parseRoom(a.room);
         html += `<tr>
             <td class="check-col"><input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleAccom(${idx}, this.checked)"></td>
             <td><strong>${a.name}</strong><br><small style="color:#6b7280">${a.subregion}</small></td>
-            <td>${a.room}</td>
+            <td>${parsed.name}</td>
             <td>${a.rooms || '-'}</td>
             <td><input type="number" class="qty-input" value="${qty}" min="1" max="${a.rooms || 99}" data-idx="${idx}" onchange="updateQty(${idx}, this.value)"></td>
+            <td style="font-size:12px;color:#6b7280;white-space:nowrap;">${parsed.capacity}</td>
             <td class="price"><input type="number" class="market-input ${marginWarn?'warn':''}" value="${market}" data-idx="${idx}" onchange="updateMarket(${idx}, this.value)" title="시중가를 직접 수정하세요">원</td>
             <td class="price"><span class="quote-price">${quote.toLocaleString()}원</span> <span class="discount-badge">${discount}%</span></td>
             <td class="margin-col price">${cost.toLocaleString()}원</td>
@@ -664,12 +683,13 @@ function renderQuote() {
         const quote = getQuotePrice(s.index, discount);
         const subtotal = quote * s.qty * numNights;
         accomTotal += subtotal;
-        return `<tr><td>${a.name}</td><td>${a.room}</td><td style="text-align:center">${s.qty}</td><td style="text-align:center">${numNights}박</td>
+        const rp = parseRoom(a.room);
+        return `<tr><td>${a.name}</td><td>${rp.name}</td><td style="text-align:center;font-size:12px;">${rp.capacity}</td><td style="text-align:center">${s.qty}</td><td style="text-align:center">${numNights}박</td>
             <td style="text-align:right"><span style="text-decoration:line-through;color:#9ca3af;font-size:11px;">${market.toLocaleString()}원</span><br><strong>${quote.toLocaleString()}원</strong></td>
             <td style="text-align:right;font-weight:600;">${subtotal.toLocaleString()}원</td></tr>`;
     }).join('');
 
-    const optionRows = selectedOptions.map(o => `<tr><td colspan="4">${o.name}</td><td style="text-align:right" colspan="2">${o.price}</td></tr>`).join('');
+    const optionRows = selectedOptions.map(o => `<tr><td colspan="5">${o.name}</td><td style="text-align:right" colspan="2">${o.price}</td></tr>`).join('');
 
     document.getElementById('quotePreview').innerHTML = `
         <div class="quote-header"><h2>견 적 서</h2><div class="quote-date">${dateStr}</div></div>
@@ -684,9 +704,9 @@ function renderQuote() {
             <div class="quote-info-item"><dt>할인율</dt><dd>시중가 대비 ${discount}% 할인</dd></div>
         </div>
         <h3 style="margin:20px 0 10px;font-size:16px;">숙소</h3>
-        <table class="quote-table"><thead><tr><th>숙소</th><th>룸타입</th><th style="text-align:center">수량</th><th style="text-align:center">박수</th><th style="text-align:right">단가</th><th style="text-align:right">소계</th></tr></thead><tbody>
+        <table class="quote-table"><thead><tr><th>숙소</th><th>룸타입</th><th style="text-align:center">수용인원</th><th style="text-align:center">수량</th><th style="text-align:center">박수</th><th style="text-align:right">단가</th><th style="text-align:right">소계</th></tr></thead><tbody>
             ${accomRows || '<tr><td colspan="6" style="text-align:center;color:#9ca3af;">선택된 숙소가 없습니다</td></tr>'}
-            <tr class="subtotal"><td colspan="5" style="text-align:right;">숙소 소계</td><td style="text-align:right;">${accomTotal.toLocaleString()}원</td></tr>
+            <tr class="subtotal"><td colspan="6" style="text-align:right;">숙소 소계</td><td style="text-align:right;">${accomTotal.toLocaleString()}원</td></tr>
         </tbody></table>
         ${selectedOptions.length ? `<h3 style="margin:20px 0 10px;font-size:16px;">추가 옵션</h3><table class="quote-table"><thead><tr><th colspan="4">항목</th><th colspan="2" style="text-align:right">가격</th></tr></thead><tbody>${optionRows}</tbody></table>` : ''}
         <div class="quote-total">
