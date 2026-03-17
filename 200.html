@@ -434,8 +434,8 @@ let selectedDay = 'weekday';
 let selectedAccom = [];
 let selectedOptions = [];
 let showMargin = false;
-// 사용자가 수정한 시중가를 저장 (key: `${index}_${costKey}`)
-let customMarket = {};
+// 사용자가 수정한 시중가를 localStorage에 저장 (key: `${index}_${costKey}`)
+let customMarket = JSON.parse(localStorage.getItem('customMarket') || '{}');
 
 const regions = [...new Set(accommodations.map(a => a.region))];
 const regionLabels = { '서울': '서울', '경기도': '경기도', '경남': '경남 (통영/남해)', '경북': '경북 (경주)', '제주': '제주', '전라도': '전라도 (진안)' };
@@ -566,6 +566,7 @@ function renderAccomTable() {
 function updateMarket(idx, val) {
     const key = `${idx}_${getCostKey()}`;
     customMarket[key] = parseInt(val) || 0;
+    localStorage.setItem('customMarket', JSON.stringify(customMarket));
     renderAccomTable();
 }
 
