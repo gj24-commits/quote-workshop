@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>단체 워크숍 견적서</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; color: #333; }
+
+        .header { background: linear-gradient(135deg, #1a365d, #2d5aa0); color: white; padding: 30px 40px; }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { opacity: 0.8; font-size: 14px; }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+        /* Step Navigation */
+        .steps { display: flex; gap: 0; margin-bottom: 30px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .step { flex: 1; padding: 16px 20px; text-align: center; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s; }
+        .step.active { background: #f0f7ff; border-bottom-color: #2d5aa0; color: #2d5aa0; font-weight: 600; }
+        .step.completed { color: #16a34a; }
+        .step-num { display: inline-block; width: 28px; height: 28px; line-height: 28px; border-radius: 50%; background: #e5e7eb; color: #666; font-size: 13px; font-weight: 700; margin-right: 8px; }
+        .step.active .step-num { background: #2d5aa0; color: white; }
+        .step.completed .step-num { background: #16a34a; color: white; }
+
+        .panel { display: none; background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .panel.active { display: block; }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #374151; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: #2d5aa0; outline: none; box-shadow: 0 0 0 3px rgba(45,90,160,0.1); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+        /* Region Selection */
+        .region-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+        .region-card { padding: 20px; border: 2px solid #e5e7eb; border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .region-card:hover { border-color: #93c5fd; background: #f0f7ff; }
+        .region-card.selected { border-color: #2d5aa0; background: #eff6ff; }
+        .region-card h3 { font-size: 16px; margin-bottom: 4px; }
+        .region-card p { font-size: 12px; color: #6b7280; }
+
+        /* Accommodation Table */
+        .accom-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+        .accom-table th { background: #f8fafc; padding: 12px 10px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600; color: #4b5563; white-space: nowrap; }
+        .accom-table td { padding: 10px; border-bottom: 1px solid #f3f4f6; }
+        .accom-table tr:hover { background: #fafbfc; }
+        .accom-table .price { text-align: right; font-variant-numeric: tabular-nums; }
+        .accom-table .market-price { color: #9ca3af; text-decoration: line-through; font-size: 12px; }
+        .accom-table .quote-price { color: #dc2626; font-weight: 700; font-size: 15px; }
+        .accom-table .discount-badge { background: #fef2f2; color: #dc2626; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+
+        .check-col { width: 40px; text-align: center; }
+        .check-col input { width: 18px; height: 18px; cursor: pointer; }
+
+        /* Season Tabs */
+        .season-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .season-tab { padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 500; border: 1px solid #d1d5db; background: white; transition: all 0.2s; }
+        .season-tab.active { background: #2d5aa0; color: white; border-color: #2d5aa0; }
+
+        .day-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .day-tab { padding: 6px 16px; border-radius: 16px; cursor: pointer; font-size: 12px; border: 1px solid #d1d5db; background: white; }
+        .day-tab.active { background: #475569; color: white; border-color: #475569; }
+
+        /* Discount Slider */
+        .discount-control { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: #fff7ed; border-radius: 10px; margin-bottom: 20px; }
+        .discount-control label { font-weight: 600; white-space: nowrap; }
+        .discount-control input[type="range"] { flex: 1; accent-color: #2d5aa0; }
+        .discount-value { font-size: 24px; font-weight: 700; color: #dc2626; min-width: 50px; text-align: center; }
+
+        /* Options */
+        .option-section { margin-top: 24px; }
+        .option-section h3 { font-size: 16px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+        .option-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+        .option-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.2s; }
+        .option-card:hover { border-color: #93c5fd; }
+        .option-card.selected { border-color: #2d5aa0; background: #eff6ff; }
+        .option-card h4 { font-size: 14px; margin-bottom: 4px; }
+        .option-card .option-price { font-size: 13px; color: #dc2626; font-weight: 600; }
+        .option-card .option-tag { font-size: 11px; color: #6b7280; margin-top: 4px; }
+        .option-card .option-age { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+
+        /* Buttons */
+        .btn-row { display: flex; justify-content: space-between; margin-top: 24px; }
+        .btn { padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+        .btn-primary { background: #2d5aa0; color: white; }
+        .btn-primary:hover { background: #1a365d; }
+        .btn-secondary { background: #e5e7eb; color: #374151; }
+        .btn-secondary:hover { background: #d1d5db; }
+        .btn-success { background: #16a34a; color: white; }
+        .btn-success:hover { background: #15803d; }
+
+        /* Quote Preview */
+        .quote-preview { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 40px; max-width: 900px; margin: 0 auto; }
+        .quote-header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #1a365d; padding-bottom: 20px; }
+        .quote-header h2 { font-size: 24px; color: #1a365d; }
+        .quote-header .quote-date { color: #6b7280; margin-top: 4px; }
+        .quote-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .quote-info-item { padding: 12px 16px; background: #f8fafc; border-radius: 8px; }
+        .quote-info-item dt { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+        .quote-info-item dd { font-weight: 600; font-size: 15px; }
+        .quote-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; }
+        .quote-table th { background: #1a365d; color: white; padding: 10px 12px; text-align: left; }
+        .quote-table td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; }
+        .quote-table .subtotal { font-weight: 600; background: #f8fafc; }
+        .quote-total { text-align: right; padding: 20px 0; border-top: 3px solid #1a365d; }
+        .quote-total .total-label { font-size: 16px; color: #6b7280; }
+        .quote-total .total-amount { font-size: 28px; font-weight: 700; color: #1a365d; }
+        .quote-total .discount-info { font-size: 13px; color: #dc2626; margin-top: 4px; }
+        .quote-note { margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 8px; font-size: 12px; color: #6b7280; line-height: 1.8; }
+
+        /* Night count */
+        .night-input { display: flex; align-items: center; gap: 8px; }
+        .night-input input { width: 80px; text-align: center; }
+        .night-input span { color: #6b7280; }
+
+        /* Quantity */
+        .qty-input { width: 60px !important; text-align: center; }
+
+        /* Print */
+        @media print {
+            body { background: white; }
+            .header, .steps, .btn-row, .panel:not(.quote-panel) { display: none !important; }
+            .panel.quote-panel { display: block !important; box-shadow: none; }
+            .container { padding: 0; }
+        }
+
+        /* Margin indicator (admin) */
+        .margin-ok { color: #16a34a; font-size: 11px; }
+        .margin-warn { color: #dc2626; font-size: 11px; }
+        .admin-toggle { position: fixed; bottom: 20px; right: 20px; padding: 8px 16px; background: #1a365d; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; z-index: 100; }
+        .margin-col { display: none; }
+        .show-margin .margin-col { display: table-cell; }
+
+        .selected-items { margin-top: 16px; }
+        .selected-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f0f7ff; border-radius: 6px; margin-bottom: 6px; font-size: 13px; }
+        .selected-item .remove { color: #dc2626; cursor: pointer; font-weight: 700; }
+
+        .empty-msg { text-align: center; padding: 40px; color: #9ca3af; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>단체 워크숍 견적서 생성기</h1>
+    <p>숙소 및 프로그램을 선택하고 맞춤 견적서를 생성하세요</p>
+</div>
+
+<div class="container">
+    <div class="steps">
+        <div class="step active" data-step="1" onclick="goToStep(1)">
+            <span class="step-num">1</span>기본 정보
+        </div>
+        <div class="step" data-step="2" onclick="goToStep(2)">
+            <span class="step-num">2</span>숙소 선택
+        </div>
+        <div class="step" data-step="3" onclick="goToStep(3)">
+            <span class="step-num">3</span>옵션 선택
+        </div>
+        <div class="step" data-step="4" onclick="goToStep(4)">
+            <span class="step-num">4</span>견적서 확인
+        </div>
+    </div>
+
+    <!-- Step 1: Basic Info -->
+    <div class="panel active" id="panel-1">
+        <h2 style="margin-bottom: 20px;">기본 정보 입력</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label>고객사명</label>
+                <input type="text" id="clientName" placeholder="예: (주)한국기업">
+            </div>
+            <div class="form-group">
+                <label>담당자명</label>
+                <input type="text" id="contactName" placeholder="예: 홍길동">
+            </div>
+        </div>
+        <div class="form-row-3">
+            <div class="form-group">
+                <label>인원수</label>
+                <input type="number" id="numPeople" placeholder="예: 30" min="1">
+            </div>
+            <div class="form-group">
+                <label>일정</label>
+                <input type="date" id="tripDate">
+            </div>
+            <div class="form-group">
+                <label>숙박 일수</label>
+                <div class="night-input">
+                    <input type="number" id="numNights" value="1" min="1" max="30">
+                    <span>박</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>목적</label>
+                <select id="purpose">
+                    <option value="힐링워크숍">힐링워크숍</option>
+                    <option value="교육연수">교육연수</option>
+                    <option value="워케이션">워케이션</option>
+                    <option value="팀빌딩">팀빌딩</option>
+                    <option value="기타">기타</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>지역 선택</label>
+                <div class="region-grid" id="regionGrid"></div>
+            </div>
+        </div>
+        <div class="btn-row">
+            <div></div>
+            <button class="btn btn-primary" onclick="goToStep(2)">다음 &rarr;</button>
+        </div>
+    </div>
+
+    <!-- Step 2: Accommodation -->
+    <div class="panel" id="panel-2">
+        <h2 style="margin-bottom: 16px;">숙소 선택</h2>
+
+        <div class="discount-control">
+            <label>할인율 설정:</label>
+            <input type="range" id="discountSlider" min="5" max="10" value="7" step="1" oninput="updateDiscount()">
+            <div class="discount-value" id="discountValue">7%</div>
+            <span style="font-size:12px;color:#92400e;">시중가 대비 할인</span>
+        </div>
+
+        <div class="season-tabs" id="seasonTabs">
+            <div class="season-tab active" data-season="low" onclick="selectSeason('low')">비수기</div>
+            <div class="season-tab" data-season="semi" onclick="selectSeason('semi')">준성수기</div>
+            <div class="season-tab" data-season="high" onclick="selectSeason('high')">성수기</div>
+        </div>
+        <div class="day-tabs" id="dayTabs">
+            <div class="day-tab active" data-day="weekday" onclick="selectDay('weekday')">주중</div>
+            <div class="day-tab" data-day="weekend" onclick="selectDay('weekend')">주말</div>
+        </div>
+
+        <div id="accomTableWrap"></div>
+
+        <div class="selected-items" id="selectedAccomList">
+            <h3 style="margin-bottom:8px;">선택된 숙소</h3>
+            <div id="selectedAccomItems"></div>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn btn-secondary" onclick="goToStep(1)">&larr; 이전</button>
+            <button class="btn btn-primary" onclick="goToStep(3)">다음 &rarr;</button>
+        </div>
+    </div>
+
+    <!-- Step 3: Options -->
+    <div class="panel" id="panel-3">
+        <h2 style="margin-bottom: 16px;">추가 옵션 선택</h2>
+        <div id="optionContent"></div>
+        <div class="selected-items" id="selectedOptionList" style="margin-top:20px;">
+            <h3 style="margin-bottom:8px;">선택된 옵션</h3>
+            <div id="selectedOptionItems"></div>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-secondary" onclick="goToStep(2)">&larr; 이전</button>
+            <button class="btn btn-primary" onclick="goToStep(4)">견적서 생성 &rarr;</button>
+        </div>
+    </div>
+
+    <!-- Step 4: Quote -->
+    <div class="panel quote-panel" id="panel-4">
+        <div class="btn-row" style="margin-top:0;margin-bottom:20px;">
+            <button class="btn btn-secondary" onclick="goToStep(3)">&larr; 수정하기</button>
+            <div>
+                <button class="btn btn-primary" onclick="window.print()">인쇄 / PDF 저장</button>
+            </div>
+        </div>
+        <div class="quote-preview" id="quotePreview"></div>
+    </div>
+</div>
+
+<button class="admin-toggle" onclick="toggleMargin()">마진 확인</button>
+
+<script>
+// ========== DATA ==========
+const accommodations = [
+    // 서울
+    { region: '서울', subregion: '마포구', name: '로컬스티치 서교점', room: '스탠다드 싱글(1)', rooms: null, cost: { low_wd: 119800, low_we: 131800, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+    { region: '서울', subregion: '마포구', name: '로컬스티치 서교점', room: '수페리어 싱글(1)', rooms: null, cost: { low_wd: 122700, low_we: 135000, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+    { region: '서울', subregion: '마포구', name: '로컬스티치 서교점', room: '스탠다드 더블(1)', rooms: null, cost: { low_wd: 129100, low_we: 142000, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+    { region: '서울', subregion: '마포구', name: '로컬스티치 서교점', room: '수페리어 트윈(2)', rooms: null, cost: { low_wd: 129100, low_we: 142000, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+    { region: '서울', subregion: '마포구', name: '로컬스티치 서교점', room: '디럭스 트윈(2)', rooms: null, cost: { low_wd: 157300, low_we: 173000, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+    { region: '서울', subregion: '마포구', name: '로컬스티치 서교점', room: '수페리어 패밀리(2~3)', rooms: null, cost: { low_wd: 225000, low_we: 269000, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+    { region: '서울', subregion: '마포구', name: '로컬스티치 서교점', room: '수페리어 트리플(2~3)', rooms: null, cost: { low_wd: 225000, low_we: 269000, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+    { region: '서울', subregion: '마포구', name: '로컬스티치 서교점', room: '디럭스 쿼드(3~4)', rooms: null, cost: { low_wd: 285000, low_we: 329000, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+
+    // 경기도
+    { region: '경기도', subregion: '시흥시', name: '르컬렉티브 시흥', room: '스튜디오 로프트룸(2~4)', rooms: null, cost: { low_wd: 88000, low_we: 139000, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+    { region: '경기도', subregion: '시흥시', name: '르컬렉티브 시흥', room: '스튜디오 로프트룸 파셜오션(2~4)', rooms: null, cost: { low_wd: 114000, low_we: 139000, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+    { region: '경기도', subregion: '시흥시', name: '르컬렉티브 시흥', room: '프리미어 스위트 패밀리(3~4)', rooms: null, cost: { low_wd: 149000, low_we: 189000, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+
+    // 통영
+    { region: '경남', subregion: '통영시', name: '로컬스티치 통영', room: '스튜디오 트리플(2~3)', rooms: 1, cost: { low_wd: 135000, low_we: 150000, semi_wd: 143650, semi_we: 169150, high_wd: 186150, high_we: 186150 } },
+    { region: '경남', subregion: '통영시', name: '로컬스티치 통영', room: '스티치 더블 강구안(1~2)', rooms: 2, cost: { low_wd: 85000, low_we: 100000, semi_wd: 92650, semi_we: 109650, high_wd: 143650, high_we: 143650 } },
+    { region: '경남', subregion: '통영시', name: '로컬스티치 통영', room: '스튜디오 오피스(1~2)', rooms: 2, cost: { low_wd: 85000, low_we: 100000, semi_wd: 92650, semi_we: 109650, high_wd: 160650, high_we: 160650 } },
+    { region: '경남', subregion: '통영시', name: '로컬스티치 통영', room: '스티치 트윈 항남동(1~2)', rooms: 2, cost: { low_wd: 85000, low_we: 100000, semi_wd: 92650, semi_we: 109650, high_wd: 126650, high_we: 126650 } },
+    { region: '경남', subregion: '통영시', name: '로컬스티치 통영', room: '스티치 미니 트윈 항남동(1~2)', rooms: 2, cost: { low_wd: 80000, low_we: 95000, semi_wd: 101150, semi_we: 101150, high_wd: 109650, high_we: 109650 } },
+    { region: '경남', subregion: '통영시', name: '로컬스티치 통영', room: '스티치 더블 항남동(1~2)', rooms: 2, cost: { low_wd: 80000, low_we: 95000, semi_wd: 84150, semi_we: 101150, high_wd: 109650, high_we: 109650 } },
+    { region: '경남', subregion: '통영시', name: '한산마리나', room: '디럭스 가든(2~4)', rooms: 13, cost: { low_wd: 120000, low_we: 180000, semi_wd: 200000, semi_we: 200000, high_wd: 200000, high_we: 200000 } },
+    { region: '경남', subregion: '통영시', name: '한산마리나', room: '디럭스 오션뷰(2~4)', rooms: 5, cost: { low_wd: 120000, low_we: 180000, semi_wd: 200000, semi_we: 200000, high_wd: 200000, high_we: 200000 } },
+    { region: '경남', subregion: '통영시', name: '한산마리나', room: '스위트 가든/오션(2~4)', rooms: 5, cost: { low_wd: 200000, low_we: 250000, semi_wd: 300000, semi_we: 300000, high_wd: 300000, high_we: 300000 } },
+    { region: '경남', subregion: '통영시', name: '한산마리나', room: '온돌 스위트 가든(2~4)', rooms: 4, cost: { low_wd: 200000, low_we: 250000, semi_wd: 300000, semi_we: 300000, high_wd: 300000, high_we: 300000 } },
+
+    // 남해
+    { region: '경남', subregion: '남해군', name: '미라도르 남해', room: '원룸 101~106호(2~3)', rooms: 6, cost: { low_wd: 72000, low_we: 99000, semi_wd: 72000, semi_we: 99000, high_wd: null, high_we: null } },
+    { region: '경남', subregion: '남해군', name: '미라도르 남해', room: '201호 쓰리룸(6~8)', rooms: 1, cost: { low_wd: 162000, low_we: 234000, semi_wd: 162000, semi_we: 234000, high_wd: null, high_we: null } },
+    { region: '경남', subregion: '남해군', name: '미라도르 남해', room: '202~203호(4~6)', rooms: 2, cost: { low_wd: 108000, low_we: 162000, semi_wd: 108000, semi_we: 162000, high_wd: null, high_we: null } },
+    { region: '경남', subregion: '남해군', name: '미라도르 남해', room: '301~302호(4~6)', rooms: 2, cost: { low_wd: 126000, low_we: 198000, semi_wd: 126000, semi_we: 198000, high_wd: null, high_we: null } },
+    { region: '경남', subregion: '남해군', name: '별그리고남해', room: '풀빌라 101~102(2~4)', rooms: 2, cost: { low_wd: 161100, low_we: 215100, semi_wd: 206100, semi_we: 260100, high_wd: 233100, high_we: 296100 } },
+    { region: '경남', subregion: '남해군', name: '별그리고남해', room: '스파복층 201~203(2~3)', rooms: 3, cost: { low_wd: 143100, low_we: 188100, semi_wd: 161100, semi_we: 197100, high_wd: 179100, high_we: 233100 } },
+    { region: '경남', subregion: '남해군', name: '맨션모락', room: '독채 풀빌라(~6)', rooms: 1, cost: { low_wd: 224100, low_we: 287100, semi_wd: 287100, semi_we: 377100, high_wd: 377100, high_we: 467100 } },
+    { region: '경남', subregion: '남해군', name: '인갤러리', room: '101(2~6)', rooms: 1, cost: { low_wd: 280000, low_we: 360000, semi_wd: 280000, semi_we: 360000, high_wd: 280000, high_we: 360000 } },
+    { region: '경남', subregion: '남해군', name: '인갤러리', room: '201(2~6)', rooms: 1, cost: { low_wd: 344000, low_we: 344000, semi_wd: 344000, semi_we: 344000, high_wd: 344000, high_we: 344000 } },
+    { region: '경남', subregion: '남해군', name: '인갤러리', room: '102,103,202,203(2~4)', rooms: 4, cost: { low_wd: 152000, low_we: 216000, semi_wd: 152000, semi_we: 216000, high_wd: 152000, high_we: 216000 } },
+    { region: '경남', subregion: '남해군', name: '벚꽃길 지나서', room: '101,102(2~4)', rooms: 2, cost: { low_wd: 144000, low_we: 171000, semi_wd: 144000, semi_we: 171000, high_wd: 144000, high_we: 171000 } },
+    { region: '경남', subregion: '남해군', name: '벚꽃길 지나서', room: '201,202(2~3)', rooms: 2, cost: { low_wd: 126000, low_we: 153000, semi_wd: 126000, semi_we: 153000, high_wd: 126000, high_we: 153000 } },
+    { region: '경남', subregion: '남해군', name: '오피스닻(소도읖)', room: 'B/C타입(2)', rooms: 4, cost: { low_wd: 170000, low_we: 190000, semi_wd: 170000, semi_we: 190000, high_wd: 230000, high_we: 230000 } },
+    { region: '경남', subregion: '남해군', name: '오피스닻(소도읖)', room: 'A타입(2~4)', rooms: 2, cost: { low_wd: 260000, low_we: 280000, semi_wd: 260000, semi_we: 280000, high_wd: 340000, high_we: 340000 } },
+
+    // 경주
+    { region: '경북', subregion: '경주시', name: '춘추관', room: '2인방(2~3)', rooms: 11, cost: { low_wd: 88000, low_we: 99000, semi_wd: 118000, semi_we: null, high_wd: null, high_we: null } },
+    { region: '경북', subregion: '경주시', name: '춘추관', room: '4인방(4~6)', rooms: 3, cost: { low_wd: 180000, low_we: 198000, semi_wd: 236000, semi_we: null, high_wd: null, high_we: null } },
+    { region: '경북', subregion: '경주시', name: '춘추관', room: '6인방(6~8)', rooms: 1, cost: { low_wd: 450000, low_we: 450000, semi_wd: 490000, semi_we: null, high_wd: null, high_we: null } },
+    { region: '경북', subregion: '경주시', name: '신라레거시', room: '패밀리 노블 스위트(키즈룸)(4)', rooms: 2, cost: { low_wd: 170000, low_we: null, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+    { region: '경북', subregion: '경주시', name: '신라레거시', room: '패밀리 로얄 스위트(키즈룸)(6)', rooms: 1, cost: { low_wd: 255000, low_we: null, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+    { region: '경북', subregion: '경주시', name: '신라레거시', room: '수페리어 스위트(4)', rooms: 10, cost: { low_wd: 153000, low_we: 212500, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+    { region: '경북', subregion: '경주시', name: '신라레거시', room: '수페리어 풀 스위트(4)', rooms: 4, cost: { low_wd: 153000, low_we: 212500, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+    { region: '경북', subregion: '경주시', name: '신라레거시', room: '레지던셜 로얄 스위트(6)', rooms: 2, cost: { low_wd: 297000, low_we: null, semi_wd: null, semi_we: null, high_wd: null, high_we: null } },
+
+    // 제주
+    { region: '제주', subregion: '서귀포시', name: '올레스테이', room: '신관 스탠다드 더블 전망x(2)', rooms: null, cost: { low_wd: 56000, low_we: 56000, semi_wd: 56000, semi_we: 56000, high_wd: 56000, high_we: 56000 } },
+    { region: '제주', subregion: '서귀포시', name: '올레스테이', room: '신관 스탠다드 더블(2)', rooms: null, cost: { low_wd: 61000, low_we: 61000, semi_wd: 61000, semi_we: 61000, high_wd: 61000, high_we: 61000 } },
+    { region: '제주', subregion: '서귀포시', name: '올레스테이', room: '신관 스탠다드 트윈(2)', rooms: null, cost: { low_wd: 63000, low_we: 63000, semi_wd: 63000, semi_we: 63000, high_wd: 63000, high_we: 63000 } },
+    { region: '제주', subregion: '서귀포시', name: '올레스테이', room: '신관 유니버설 더블(2~3)', rooms: null, cost: { low_wd: 70000, low_we: 70000, semi_wd: 70000, semi_we: 70000, high_wd: 70000, high_we: 70000 } },
+    { region: '제주', subregion: '서귀포시', name: '올레스테이', room: '신관 루프탑 독채(4~6)', rooms: null, cost: { low_wd: 240000, low_we: 240000, semi_wd: 240000, semi_we: 240000, high_wd: 240000, high_we: 240000 } },
+
+    // 진안
+    { region: '전라도', subregion: '진안군', name: '고원산림치유원', room: '하늘동(2)', rooms: null, cost: { low_wd: 44000, low_we: 76000, semi_wd: 44000, semi_we: 76000, high_wd: 76000, high_we: 76000 } },
+    { region: '전라도', subregion: '진안군', name: '고원산림치유원', room: '하늘동(4)', rooms: null, cost: { low_wd: 75000, low_we: 134000, semi_wd: 75000, semi_we: 134000, high_wd: 134000, high_we: 134000 } },
+    { region: '전라도', subregion: '진안군', name: '고원산림치유원', room: '하늘동(5)', rooms: null, cost: { low_wd: 95000, low_we: 162000, semi_wd: 95000, semi_we: 162000, high_wd: 162000, high_we: 162000 } },
+    { region: '전라도', subregion: '진안군', name: '고원산림치유원', room: '바람동(4)', rooms: null, cost: { low_wd: 75000, low_we: 134000, semi_wd: 75000, semi_we: 134000, high_wd: 134000, high_we: 134000 } },
+    { region: '전라도', subregion: '진안군', name: '고원산림치유원', room: '바람동(5)', rooms: null, cost: { low_wd: 124000, low_we: 208000, semi_wd: 124000, semi_we: 208000, high_wd: 208000, high_we: 208000 } },
+    { region: '전라도', subregion: '진안군', name: '고원산림치유원', room: '바람동(6) 연립', rooms: null, cost: { low_wd: 152000, low_we: 236000, semi_wd: 152000, semi_we: 236000, high_wd: 236000, high_we: 236000 } },
+    { region: '전라도', subregion: '진안군', name: '고원산림치유원', room: '바람동(6) 단독', rooms: null, cost: { low_wd: 163000, low_we: 240000, semi_wd: 163000, semi_we: 240000, high_wd: 240000, high_we: 240000 } },
+];
+
+const options = {
+    '경남_통영': [
+        { name: '한산마리나 요트투어(선셋)', price: '30,000원', desc: '1시간 소요', ages: '전연령' },
+        { name: '한산마리나 섬요트투어', price: '50,000원', desc: '3시간 소요', ages: '전연령' },
+        { name: '봉수골 마을투어', price: '20,000원', desc: '마을투어', ages: '청소년, 성인' },
+        { name: '봉수골 마을투어+차담회', price: '25,000원', desc: '마을투어+차담회', ages: '청소년, 성인' },
+        { name: '학림도 어촌체험', price: '문의', desc: '바지락캐기, 선상낚시, 통발체험, 깡통열차', ages: '전연령' },
+    ],
+    '경남_남해': [
+        { name: '미라도르 요트투어', price: '성인 20,000원 / 어린이 10,000원', desc: '', ages: '전연령' },
+        { name: '미라도르 선셋요트투어', price: '성인 30,000원 / 청소년 20,000원', desc: '', ages: '전연령' },
+        { name: '소셜다이닝', price: '30,000원', desc: '', ages: '어린이~성인' },
+        { name: '천영공방 리페어', price: '문의', desc: '프리저브드캔들홀더, 바다 그립톡, 레진아트, 유자비누', ages: '전연령', tag: 'ESG, 공방' },
+        { name: '유자 아뜰리에', price: '문의', desc: '향수 만들기', ages: '전연령', tag: '공방' },
+        { name: '내산공방', price: '문의', desc: '편백나무 오르골체험', ages: '전연령', tag: '공방' },
+        { name: '글꼴아뜰리에', price: '문의', desc: '글라스아트, 도우아트 화분, 레진아트', ages: '전연령', tag: '공방' },
+        { name: 'B급 상점', price: '문의', desc: '나만의 티셔츠, 네임택 만들기', ages: '전연령', tag: '공방' },
+        { name: '오시다공방', price: '문의', desc: '식물 소품, 레진손거울, 압화 손거울', ages: '전연령', tag: '소품샵' },
+        { name: '티라와 흙꿉노리', price: '문의', desc: '도자기 공방', ages: '전연령', tag: '공방, 체험' },
+        { name: '카약투어', price: '문의', desc: '설리해수욕장 (6~9월)', ages: '전연령' },
+        { name: '서핑', price: '문의', desc: '송정솔바람해변', ages: '전연령' },
+        { name: '마린레저', price: '문의', desc: '바나나보트, 플라잉피쉬, 제트스키 등', ages: '전연령' },
+    ],
+    '경북_경주': [
+        { name: '버드파크', price: '성인 20,000원 / 어린이 15,000원', desc: '24개월 미만 무료', ages: '전연령' },
+        { name: '정글미디어파크', price: '성인 19,000원 / 청소년 17,000원 / 어린이 13,000원', desc: '36개월 미만 무료', ages: '전연령' },
+        { name: '경주엑스포대공원', price: '성인 12,000원 / 어린이 10,000원', desc: '만65세 이상 4,000원', ages: '전연령' },
+        { name: '히어로플레이파크', price: '아동 3시간 무료 / 부모님 입장권 7,000원', desc: '', ages: '어린이~성인' },
+        { name: '자동차 박물관', price: '성인 9,900원 / 청소년 8,800원 / 어린이 6,600원', desc: '36개월 미만 무료', ages: '전연령' },
+    ],
+    '제주_서귀포': [
+        { name: '올레길 걷기 투어', price: '문의', desc: '제주 전역', ages: '어린이~성인', tag: '액티비티, 힐링' },
+        { name: '문섬 스쿠버 다이빙', price: '문의', desc: '서귀포', ages: '청소년~성인', tag: '액티비티, 레저' },
+        { name: '짚라인', price: '문의', desc: '조천', ages: '어린이~성인', tag: '액티비티' },
+        { name: '스누피 공원', price: '문의', desc: '', ages: '전연령', tag: '자유관람, 힐링' },
+        { name: '981 파크', price: '문의', desc: '', ages: '어린이~성인', tag: '액티비티' },
+        { name: '아쿠아플래닛 제주', price: '문의', desc: '', ages: '전연령', tag: '자유관람, 힐링' },
+        { name: '감귤따기 체험', price: '문의', desc: '', ages: '전연령', tag: '액티비티, 힐링' },
+        { name: 'ATV', price: '문의', desc: '제주시, 서귀포시', ages: '어린이~성인', tag: '액티비티' },
+        { name: '오설록 티뮤지엄', price: '문의', desc: '', ages: '전연령', tag: '힐링' },
+        { name: '승마공원', price: '문의', desc: '애월읍', ages: '어린이~성인', tag: '액티비티, 힐링' },
+        { name: '네모바지선 낚시', price: '문의', desc: '서귀포', ages: '전연령', tag: '액티비티, 레저, 힐링' },
+        { name: '비자숲힐링센터', price: '문의', desc: '건습식테라피 및 검사', ages: '청소년~성인', tag: '힐링' },
+    ],
+    '전라도_진안': [
+        { name: '치유장비 1시간', price: '16,000원', desc: '기본구성 (프로그램 1개는 기본셋)', ages: '전연령' },
+        { name: '산림치유 프로그램 2시간', price: '12,000원', desc: '가족과 함께하는 숲산책, 싱잉볼, 다도명상 등', ages: '전연령' },
+        { name: '식사 (일반식 성인)', price: '8,000원', desc: '', ages: '성인' },
+        { name: '식사 (일반식 어린이)', price: '5,500원', desc: '', ages: '어린이' },
+        { name: '식사 (특식)', price: '15,000원', desc: '성인, 어린이 동일', ages: '전연령' },
+        { name: '대관 (소통카페)', price: '150,000원 (2시간)', desc: '', ages: '-' },
+    ],
+};
+
+// ========== STATE ==========
+let currentStep = 1;
+let selectedRegion = null;
+let selectedSeason = 'low';
+let selectedDay = 'weekday';
+let selectedAccom = []; // { index, qty, cost, room, name }
+let selectedOptions = []; // { name, price }
+let showMargin = false;
+
+const regions = [...new Set(accommodations.map(a => a.region))];
+const regionLabels = { '서울': '서울', '경기도': '경기도', '경남': '경남 (통영/남해)', '경북': '경북 (경주)', '제주': '제주', '전라도': '전라도 (진안)' };
+
+// ========== INIT ==========
+function init() {
+    renderRegions();
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('tripDate').value = today;
+}
+
+function renderRegions() {
+    const grid = document.getElementById('regionGrid');
+    grid.innerHTML = regions.map(r => `
+        <div class="region-card ${selectedRegion === r ? 'selected' : ''}" onclick="selectRegion('${r}')">
+            <h3>${regionLabels[r] || r}</h3>
+        </div>
+    `).join('');
+}
+
+function selectRegion(r) {
+    selectedRegion = r;
+    selectedAccom = [];
+    selectedOptions = [];
+    renderRegions();
+}
+
+// ========== PRICING ==========
+// 시중가 = 원가 / 0.82 (약 22% 마크업) -> 10% 할인해도 원가 대비 ~10% 마진
+// 최소 마진 5% 보장: 견적가 >= 원가 / 0.95
+function getMarketPrice(costPrice) {
+    if (!costPrice) return null;
+    return Math.ceil(costPrice / 0.82 / 1000) * 1000; // 1000원 단위 올림
+}
+
+function getQuotePrice(costPrice, discountPct) {
+    const market = getMarketPrice(costPrice);
+    if (!market) return null;
+    let quote = Math.round(market * (1 - discountPct / 100));
+    // 최소 마진 5% 보장
+    const minQuote = Math.ceil(costPrice / 0.95);
+    if (quote < minQuote) quote = minQuote;
+    return Math.ceil(quote / 100) * 100; // 100원 단위 올림
+}
+
+function getMarginPct(costPrice, quotePrice) {
+    if (!costPrice || !quotePrice) return 0;
+    return ((quotePrice - costPrice) / quotePrice * 100).toFixed(1);
+}
+
+function getCostKey() {
+    return `${selectedSeason === 'low' ? 'low' : selectedSeason === 'semi' ? 'semi' : 'high'}_${selectedDay === 'weekday' ? 'wd' : 'we'}`;
+}
+
+// ========== STEPS ==========
+function goToStep(step) {
+    if (step === 2 && !selectedRegion) {
+        alert('지역을 먼저 선택해주세요.');
+        return;
+    }
+    currentStep = step;
+    document.querySelectorAll('.step').forEach(s => {
+        const sn = parseInt(s.dataset.step);
+        s.classList.toggle('active', sn === step);
+        s.classList.toggle('completed', sn < step);
+    });
+    document.querySelectorAll('.panel').forEach((p, i) => p.classList.toggle('active', i + 1 === step));
+
+    if (step === 2) renderAccomTable();
+    if (step === 3) renderOptions();
+    if (step === 4) renderQuote();
+}
+
+// ========== ACCOMMODATION TABLE ==========
+function renderAccomTable() {
+    const discount = parseInt(document.getElementById('discountSlider').value);
+    const costKey = getCostKey();
+    const filtered = accommodations.filter(a => a.region === selectedRegion);
+
+    if (filtered.length === 0) {
+        document.getElementById('accomTableWrap').innerHTML = '<div class="empty-msg">선택한 지역에 숙소가 없습니다.</div>';
+        return;
+    }
+
+    let html = `<table class="accom-table" id="accomTable">
+        <thead><tr>
+            <th class="check-col"></th>
+            <th>숙소</th>
+            <th>룸타입</th>
+            <th>룸수</th>
+            <th>수량</th>
+            <th class="price">시중가</th>
+            <th class="price">할인가 (${discount}%↓)</th>
+            <th class="margin-col price">원가</th>
+            <th class="margin-col price">마진율</th>
+        </tr></thead><tbody>`;
+
+    filtered.forEach((a, idx) => {
+        const globalIdx = accommodations.indexOf(a);
+        const cost = a.cost[costKey];
+        if (cost === null || cost === undefined) {
+            // Show but disabled
+            html += `<tr style="opacity:0.4;">
+                <td class="check-col"><input type="checkbox" disabled></td>
+                <td>${a.name}</td><td>${a.room}</td><td>${a.rooms || '-'}</td><td>-</td>
+                <td class="price">-</td><td class="price">-</td>
+                <td class="margin-col price">-</td><td class="margin-col price">-</td>
+            </tr>`;
+            return;
+        }
+        const market = getMarketPrice(cost);
+        const quote = getQuotePrice(cost, discount);
+        const margin = getMarginPct(cost, quote);
+        const isSelected = selectedAccom.find(s => s.index === globalIdx);
+        const qty = isSelected ? isSelected.qty : 1;
+
+        html += `<tr>
+            <td class="check-col"><input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleAccom(${globalIdx}, this.checked, this.closest('tr'))"></td>
+            <td><strong>${a.name}</strong><br><small style="color:#6b7280">${a.subregion}</small></td>
+            <td>${a.room}</td>
+            <td>${a.rooms || '-'}</td>
+            <td><input type="number" class="qty-input" value="${qty}" min="1" max="${a.rooms || 99}" data-idx="${globalIdx}" onchange="updateQty(${globalIdx}, this.value)"></td>
+            <td class="price"><span class="market-price">${market.toLocaleString()}원</span></td>
+            <td class="price"><span class="quote-price">${quote.toLocaleString()}원</span> <span class="discount-badge">${discount}%↓</span></td>
+            <td class="margin-col price">${cost.toLocaleString()}원</td>
+            <td class="margin-col price"><span class="${parseFloat(margin) >= 5 ? 'margin-ok' : 'margin-warn'}">${margin}%</span></td>
+        </tr>`;
+    });
+
+    html += '</tbody></table>';
+    document.getElementById('accomTableWrap').innerHTML = html;
+    if (showMargin) document.getElementById('accomTable').classList.add('show-margin');
+    renderSelectedAccom();
+}
+
+function toggleAccom(idx, checked) {
+    if (checked) {
+        const a = accommodations[idx];
+        const costKey = getCostKey();
+        const cost = a.cost[costKey];
+        const discount = parseInt(document.getElementById('discountSlider').value);
+        const quote = getQuotePrice(cost, discount);
+        const qtyInput = document.querySelector(`input.qty-input[data-idx="${idx}"]`);
+        const qty = qtyInput ? parseInt(qtyInput.value) : 1;
+        selectedAccom.push({ index: idx, qty, cost, quote, room: a.room, name: a.name });
+    } else {
+        selectedAccom = selectedAccom.filter(s => s.index !== idx);
+    }
+    renderSelectedAccom();
+}
+
+function updateQty(idx, val) {
+    const item = selectedAccom.find(s => s.index === idx);
+    if (item) item.qty = parseInt(val) || 1;
+    renderSelectedAccom();
+}
+
+function removeAccom(idx) {
+    selectedAccom = selectedAccom.filter(s => s.index !== idx);
+    renderAccomTable();
+}
+
+function renderSelectedAccom() {
+    const wrap = document.getElementById('selectedAccomItems');
+    if (selectedAccom.length === 0) {
+        wrap.innerHTML = '<div style="color:#9ca3af;font-size:13px;padding:8px;">숙소를 선택해주세요</div>';
+        return;
+    }
+    wrap.innerHTML = selectedAccom.map(s => {
+        const a = accommodations[s.index];
+        const discount = parseInt(document.getElementById('discountSlider').value);
+        const costKey = getCostKey();
+        const cost = a.cost[costKey];
+        const quote = getQuotePrice(cost, discount);
+        s.quote = quote;
+        s.cost = cost;
+        return `<div class="selected-item">
+            <span>${a.name} - ${a.room} x ${s.qty}실</span>
+            <span>${(quote * s.qty).toLocaleString()}원/박 <span class="remove" onclick="removeAccom(${s.index})">X</span></span>
+        </div>`;
+    }).join('');
+}
+
+function updateDiscount() {
+    const v = document.getElementById('discountSlider').value;
+    document.getElementById('discountValue').textContent = v + '%';
+    renderAccomTable();
+}
+
+function selectSeason(s) {
+    selectedSeason = s;
+    document.querySelectorAll('.season-tab').forEach(t => t.classList.toggle('active', t.dataset.season === s));
+    // Update selected items' prices
+    selectedAccom.forEach(item => {
+        const a = accommodations[item.index];
+        const costKey = getCostKey();
+        item.cost = a.cost[costKey];
+    });
+    renderAccomTable();
+}
+
+function selectDay(d) {
+    selectedDay = d;
+    document.querySelectorAll('.day-tab').forEach(t => t.classList.toggle('active', t.dataset.day === d));
+    selectedAccom.forEach(item => {
+        const a = accommodations[item.index];
+        const costKey = getCostKey();
+        item.cost = a.cost[costKey];
+    });
+    renderAccomTable();
+}
+
+// ========== OPTIONS ==========
+function renderOptions() {
+    const wrap = document.getElementById('optionContent');
+    // Find matching options for the selected region
+    let matchedOptions = [];
+    for (const key in options) {
+        if (key.startsWith(selectedRegion) || accommodations.filter(a => a.region === selectedRegion).some(a => key.includes(a.subregion.replace('시','').replace('군','')))) {
+            matchedOptions = matchedOptions.concat(options[key].map(o => ({...o, groupKey: key})));
+        }
+    }
+
+    // Also try matching by subregion
+    if (matchedOptions.length === 0) {
+        const subregions = [...new Set(accommodations.filter(a => a.region === selectedRegion).map(a => a.subregion))];
+        for (const key in options) {
+            for (const sub of subregions) {
+                if (key.includes(sub.replace('시','').replace('군',''))) {
+                    matchedOptions = matchedOptions.concat(options[key].map(o => ({...o, groupKey: key})));
+                }
+            }
+        }
+    }
+
+    // Deduplicate
+    const seen = new Set();
+    matchedOptions = matchedOptions.filter(o => {
+        const k = o.name + o.price;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+    });
+
+    if (matchedOptions.length === 0) {
+        wrap.innerHTML = '<div class="empty-msg">선택한 지역에 추가 옵션이 없습니다.</div>';
+        return;
+    }
+
+    wrap.innerHTML = '<div class="option-grid">' + matchedOptions.map((o, i) => {
+        const isSelected = selectedOptions.find(s => s.name === o.name);
+        return `<div class="option-card ${isSelected ? 'selected' : ''}" onclick="toggleOption(${i}, this)" data-oidx="${i}">
+            <h4>${o.name}</h4>
+            <div class="option-price">${o.price}</div>
+            ${o.desc ? `<div class="option-tag">${o.desc}</div>` : ''}
+            <div class="option-age">${o.ages || ''} ${o.tag ? '| ' + o.tag : ''}</div>
+        </div>`;
+    }).join('') + '</div>';
+
+    // Store for reference
+    wrap._options = matchedOptions;
+    renderSelectedOptions();
+}
+
+function toggleOption(idx, el) {
+    const wrap = document.getElementById('optionContent');
+    const o = wrap._options[idx];
+    const existing = selectedOptions.findIndex(s => s.name === o.name);
+    if (existing >= 0) {
+        selectedOptions.splice(existing, 1);
+        el.classList.remove('selected');
+    } else {
+        selectedOptions.push({ name: o.name, price: o.price, desc: o.desc });
+        el.classList.add('selected');
+    }
+    renderSelectedOptions();
+}
+
+function removeOption(name) {
+    selectedOptions = selectedOptions.filter(o => o.name !== name);
+    renderOptions();
+}
+
+function renderSelectedOptions() {
+    const wrap = document.getElementById('selectedOptionItems');
+    if (selectedOptions.length === 0) {
+        wrap.innerHTML = '<div style="color:#9ca3af;font-size:13px;padding:8px;">옵션을 선택해주세요 (선택사항)</div>';
+        return;
+    }
+    wrap.innerHTML = selectedOptions.map(o => `
+        <div class="selected-item">
+            <span>${o.name}</span>
+            <span>${o.price} <span class="remove" onclick="removeOption('${o.name}')">X</span></span>
+        </div>
+    `).join('');
+}
+
+// ========== QUOTE ==========
+function renderQuote() {
+    const clientName = document.getElementById('clientName').value || '고객사';
+    const contactName = document.getElementById('contactName').value || '-';
+    const numPeople = document.getElementById('numPeople').value || '-';
+    const tripDate = document.getElementById('tripDate').value || '-';
+    const numNights = parseInt(document.getElementById('numNights').value) || 1;
+    const purpose = document.getElementById('purpose').value;
+    const discount = parseInt(document.getElementById('discountSlider').value);
+    const seasonLabel = { low: '비수기', semi: '준성수기', high: '성수기' }[selectedSeason];
+    const dayLabel = selectedDay === 'weekday' ? '주중' : '주말';
+
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일`;
+
+    let accomTotal = 0;
+    const accomRows = selectedAccom.map(s => {
+        const a = accommodations[s.index];
+        const costKey = getCostKey();
+        const cost = a.cost[costKey];
+        const quote = getQuotePrice(cost, discount);
+        const subtotal = quote * s.qty * numNights;
+        accomTotal += subtotal;
+        return `<tr>
+            <td>${a.name}</td>
+            <td>${a.room}</td>
+            <td style="text-align:center">${s.qty}</td>
+            <td style="text-align:center">${numNights}박</td>
+            <td style="text-align:right"><span style="text-decoration:line-through;color:#9ca3af;font-size:11px;">${getMarketPrice(cost).toLocaleString()}원</span><br><strong>${quote.toLocaleString()}원</strong></td>
+            <td style="text-align:right;font-weight:600;">${subtotal.toLocaleString()}원</td>
+        </tr>`;
+    }).join('');
+
+    const optionRows = selectedOptions.map(o => `
+        <tr>
+            <td colspan="4">${o.name}</td>
+            <td style="text-align:right" colspan="2">${o.price}</td>
+        </tr>
+    `).join('');
+
+    const preview = document.getElementById('quotePreview');
+    preview.innerHTML = `
+        <div class="quote-header">
+            <h2>견 적 서</h2>
+            <div class="quote-date">${dateStr}</div>
+        </div>
+
+        <div class="quote-info-grid">
+            <div class="quote-info-item"><dt>고객사</dt><dd>${clientName}</dd></div>
+            <div class="quote-info-item"><dt>담당자</dt><dd>${contactName}</dd></div>
+            <div class="quote-info-item"><dt>인원</dt><dd>${numPeople}명</dd></div>
+            <div class="quote-info-item"><dt>일정</dt><dd>${tripDate} (${numNights}박)</dd></div>
+            <div class="quote-info-item"><dt>목적</dt><dd>${purpose}</dd></div>
+            <div class="quote-info-item"><dt>지역</dt><dd>${regionLabels[selectedRegion] || selectedRegion}</dd></div>
+            <div class="quote-info-item"><dt>시즌</dt><dd>${seasonLabel} / ${dayLabel}</dd></div>
+            <div class="quote-info-item"><dt>할인율</dt><dd>시중가 대비 ${discount}% 할인</dd></div>
+        </div>
+
+        <h3 style="margin:20px 0 10px;font-size:16px;">숙소</h3>
+        <table class="quote-table">
+            <thead><tr>
+                <th>숙소</th><th>룸타입</th><th style="text-align:center">수량</th><th style="text-align:center">박수</th><th style="text-align:right">단가</th><th style="text-align:right">소계</th>
+            </tr></thead>
+            <tbody>
+                ${accomRows || '<tr><td colspan="6" style="text-align:center;color:#9ca3af;">선택된 숙소가 없습니다</td></tr>'}
+                <tr class="subtotal">
+                    <td colspan="5" style="text-align:right;">숙소 소계</td>
+                    <td style="text-align:right;">${accomTotal.toLocaleString()}원</td>
+                </tr>
+            </tbody>
+        </table>
+
+        ${selectedOptions.length > 0 ? `
+        <h3 style="margin:20px 0 10px;font-size:16px;">추가 옵션</h3>
+        <table class="quote-table">
+            <thead><tr><th colspan="4">항목</th><th colspan="2" style="text-align:right">가격</th></tr></thead>
+            <tbody>${optionRows}</tbody>
+        </table>` : ''}
+
+        <div class="quote-total">
+            <div class="total-label">숙소 합계 금액</div>
+            <div class="total-amount">${accomTotal.toLocaleString()}원</div>
+            <div class="discount-info">시중가 대비 ${discount}% 할인 적용 (${seasonLabel} ${dayLabel} 기준)</div>
+            ${selectedOptions.length > 0 ? '<div style="font-size:12px;color:#6b7280;margin-top:4px;">* 추가 옵션 비용은 별도입니다</div>' : ''}
+        </div>
+
+        <div class="quote-note">
+            <strong>안내사항</strong><br>
+            - 본 견적서는 발행일로부터 7일간 유효합니다.<br>
+            - 숙소 가격은 ${seasonLabel} ${dayLabel} 기준이며, 시즌 및 요일에 따라 변동될 수 있습니다.<br>
+            - 추가 옵션 비용은 인원수 및 세부 사항에 따라 변동될 수 있습니다.<br>
+            - 예약 확정 시 별도 계약서를 통해 최종 금액이 확정됩니다.<br>
+            - VAT 별도
+        </div>
+    `;
+}
+
+// ========== ADMIN ==========
+function toggleMargin() {
+    showMargin = !showMargin;
+    const table = document.getElementById('accomTable');
+    if (table) table.classList.toggle('show-margin', showMargin);
+    document.querySelector('.admin-toggle').textContent = showMargin ? '마진 숨기기' : '마진 확인';
+}
+
+// ========== START ==========
+init();
+</script>
+
+</body>
+</html>
