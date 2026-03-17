@@ -784,7 +784,17 @@ function renderQuote() {
             - 숙소 가격은 ${seasonLabel} ${dayLabel} 기준이며, 시즌 및 요일에 따라 변동될 수 있습니다.<br>
             - 추가 옵션 비용은 인원수 및 세부 사항에 따라 변동될 수 있습니다.<br>
             - 예약 확정 시 별도 계약서를 통해 최종 금액이 확정됩니다.<br>
-            - VAT 포함</div>`;
+            - VAT 포함</div>
+
+        <div style="margin-top:40px;display:flex;justify-content:flex-end;align-items:center;gap:40px;">
+            <div style="text-align:center;">
+                <div style="font-size:14px;font-weight:600;color:#1a365d;margin-bottom:4px;">${dateStr}</div>
+                <div style="font-size:16px;font-weight:700;color:#1a365d;">(주)다리메이커</div>
+                <div style="margin-top:8px;position:relative;display:inline-block;">
+                    <img src="seal.png" alt="법인인감" style="width:120px;height:120px;object-fit:contain;">
+                </div>
+            </div>
+        </div>`;
 }
 
 function toggleMargin() {
